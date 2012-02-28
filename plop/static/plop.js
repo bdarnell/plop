@@ -1,9 +1,7 @@
 // based on http://mbostock.github.com/d3/ex/bubble.html
 startDrawing = function(data) {
     var r = 1600;
-    var svg = d3.select("#graph").append("svg")
-        .attr("width", r)
-        .attr("height", r)
+    var svg = d3.select("#graph");
     console.log("creating force");
     var force = d3.layout.force()
         .charge(-320)
@@ -15,13 +13,6 @@ startDrawing = function(data) {
     console.log("started force");
     var fill = d3.scale.category20c();
 
-    var links = svg.selectAll("line")
-        .data(data.edges)
-        .enter().append("line")
-        .style("stroke-width", 3)
-        .style("stroke", "#777")
-        .style("stroke-opacity", 0.6);
-    console.log("added links");
 
     var gnodes = svg.selectAll("g.node")
         .data(data.nodes)
@@ -40,6 +31,14 @@ startDrawing = function(data) {
         .attr("fill", "#000");
     console.log("added nodes");
 
+    var links = svg.selectAll("line")
+        .data(data.edges)
+        .enter().append("line")
+        .style("stroke-width", 3)
+        .style("stroke", "#777")
+        .style("stroke-opacity", 0.4)
+        .attr("marker-end", "url(#Triangle)");
+    console.log("added links");
 
     force.on("tick", function() {
         console.log("tick");

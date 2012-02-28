@@ -24,7 +24,8 @@ class DataHandler(RequestHandler):
     def get(self):
         MAX_NODES = 200
         nodes=[dict(attrs=node.attrs, weights=node.weights, id=node.id)
-               for node in self.graph.nodes.itervalues()]
+               for node in self.graph.nodes.itervalues()
+               if 'tornado' in node.attrs['fullpath']]
         nodes = sorted(nodes, key=lambda n: -n['weights']['calls'])[:MAX_NODES]
         index = {node['id']: i for i, node in enumerate(nodes)}
         edges = [dict(source=index[edge.parent.id],
