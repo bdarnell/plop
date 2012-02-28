@@ -22,7 +22,16 @@ class DataHandler(RequestHandler):
         self.graph = graph
     
     def get(self):
-        self.write(dict(nodes=[dict(attrs=node.attrs, weights=node.weights) for node in self.graph.nodes.itervalues()]))
+        MAX_NODES = 100
+        nodes=[dict(attrs=node.attrs, weights=node.weights, id=node.id)
+               for node in self.graph.nodes.itervalues()]
+        nodes = sorted(nodes, key=lambda n: -n['weights']['calls'])[:MAX_NODES]
+        index = {node['id']: i for i, node in enumerate(nodes)}
+        edges = [dict(source=index[edge.parent.id],
+                      target=index[edge.child.id],
+                      weights=edge.weights)
+                 for edge in self.graph.edges.itervalues() if edge.parent.id in index and edge.child.id in index]
+        self.write(dict(nodes=nodes, edges=edges))
 
 def main():
     parse_command_line()
