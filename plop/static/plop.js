@@ -6,8 +6,8 @@ startDrawing = function(data) {
         .attr("height", r)
     console.log("creating force");
     var force = d3.layout.force()
-        .charge(-120)
-        .linkDistance(30)
+        .charge(-320)
+        .linkDistance(200)
         .size([r,r])
         .nodes(data.nodes)
         .links(data.edges)
@@ -31,7 +31,7 @@ startDrawing = function(data) {
     gnodes.append("title")
         .text(function(d) { return d.attrs.filename + ":" + d.attrs.lineno + ":" + d.attrs.funcname + ": " + d.weights.calls });
     var circles = gnodes.append("circle")
-        .attr("r", function(d) { return Math.log(d.weights.calls) })
+        .attr("r", function(d) { return 4*Math.log(d.weights.calls) })
         .attr("fill", function(d) {return fill(d.attrs.filename) });
     var texts = gnodes.append("text")
         .text(function(d) { return d.attrs.funcname })

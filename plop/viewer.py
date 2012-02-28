@@ -22,7 +22,7 @@ class DataHandler(RequestHandler):
         self.graph = graph
     
     def get(self):
-        MAX_NODES = 100
+        MAX_NODES = 200
         nodes=[dict(attrs=node.attrs, weights=node.weights, id=node.id)
                for node in self.graph.nodes.itervalues()]
         nodes = sorted(nodes, key=lambda n: -n['weights']['calls'])[:MAX_NODES]
