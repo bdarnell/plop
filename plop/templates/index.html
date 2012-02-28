@@ -6,7 +6,9 @@
 <script src="/static/plop.js"></script>
 </head>
 <body>
-  <svg width="0" height="0" id="graph">
+  <button id="calls">Calls</button>
+  <button id="time">Time</button>
+  <svg width="1000" height="1000" id="graph">
     <defs>
       <!-- from http://www.w3.org/TR/SVG/painting.html#Markers -->
       <!-- Increasing refX moves the marker away from the end of the line -->
@@ -19,12 +21,6 @@
       </marker>
     </defs>
   </svg>
-  <button id="calls">Calls</button>
-  <button id="time">Time</button>
-  <p/>
-    
-   <div id="treemap" style="width: 1600px; height: 1600px; position:relative">
-   </div>
   <script>fetchData()</script>
 </body>
 </html>
