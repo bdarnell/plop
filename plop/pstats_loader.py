@@ -21,7 +21,6 @@ def _make_node(func_spec):
 def load_pstats(filename):
     graph = CallGraph()
     stats = pstats.Stats(filename)
-    logging.info(`stats.stats`[:500])
     for k, v in stats.stats.iteritems():
         func_spec = FuncSpec(*k)
         timing = Timing(*v[:-1])

@@ -4,7 +4,7 @@ import unittest
 
 TEST_MODULES = [
     'plop.test.callgraph_test',
-    'plop.test.pstats_test',
+    'plop.test.pstats_loader_test',
     ]
 
 def all():
