@@ -47,7 +47,6 @@ class CallGraph(object):
         self.edges = {}
 
     def add_stack(self, nodes, weights):
-        assert len(nodes) > 1
         nodes = [self.nodes.setdefault(n.id, n) for n in nodes]
         weights = Counter(weights)
         
