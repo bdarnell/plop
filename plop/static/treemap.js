@@ -24,6 +24,7 @@ startDrawing = function(data) {
         .call(cell);
 
     d3.select("#calls").on("click", function() {
+        d3.selectAll("line").remove();
         div.selectAll("div")
             .data(treemap.value(function(d) { return d.weights.calls }))
             .transition()
@@ -32,6 +33,7 @@ startDrawing = function(data) {
                  
     });
     d3.select("#time").on("click", function() {
+        d3.selectAll("line").remove();
         div.selectAll("div")
             .data(treemap.value(function(d) { return d.weights.time }))
             .transition()
@@ -51,23 +53,31 @@ startDrawing = function(data) {
         ;
     }
 
-    var svg = d3.select("#overlay");
-    svg.selectAll("line")
-        .data(data.edges)
-        .enter().append("line")
-        .attr("x1", function(d) { var n = data.nodes[d.source]; return n.x + (n.dx/2) })
-        .attr("y1", function(d) { var n = data.nodes[d.source]; return n.y + (n.dy/2) })
-        .attr("x2", function(d) { var n = data.nodes[d.source]; return n.x + (n.dx/2) })
-        .attr("y2", function(d) { var n = data.nodes[d.source]; return n.y + (n.dy/2) })
-        .style("stroke", "#777")
-        .style("stroke-width", "1")
-        .style("stroke-opacity", 0.4)
-        .transition()
-        .duration(1000)
-        .attr("x2", function(d) { var n = data.nodes[d.target]; return n.x + (n.dx/2) })
-        .attr("y2", function(d) { var n = data.nodes[d.target]; return n.y + (n.dy/2) })
+    d3.selectAll("div.cell")
+        .on("click", function() {
+            var mydatum = d3.select(this).datum();
 
-    ;
+            
+            var svg = d3.select("#overlay");
+            svg.selectAll("line")
+                .data(data.edges.filter(function(d) { return (data.nodes[d.source] == mydatum || data.nodes[d.target] == mydatum) }))
+                .enter().append("line")
+                .attr("x1", function(d) { var n = data.nodes[d.source]; return n.x + (n.dx/2) })
+                .attr("y1", function(d) { var n = data.nodes[d.source]; return n.y + (n.dy/2) })
+                .attr("x2", function(d) { var n = data.nodes[d.source]; return n.x + (n.dx/2) })
+                .attr("y2", function(d) { var n = data.nodes[d.source]; return n.y + (n.dy/2) })
+                .style("stroke", "#000")
+                .style("stroke-width", "3")
+                .style("stroke-opacity", 0.6)
+                .attr("marker-end", "url(#Triangle)")
+                .transition()
+                .duration(1000)
+                .attr("x2", function(d) { var n = data.nodes[d.target]; return n.x + (n.dx/2) })
+                .attr("y2", function(d) { var n = data.nodes[d.target]; return n.y + (n.dy/2) })
+            ;
+        })
+;
+    /**/
 }
 
 fetchData = function() {
