@@ -1,6 +1,6 @@
 // based on http://mbostock.github.com/d3/ex/bubble.html
 startDrawing = function(data) {
-    var r = 1600;
+    var r = 1200;
     var treemap = d3.layout.treemap()
         .size([r,r])
         .sticky(true)
@@ -13,7 +13,6 @@ startDrawing = function(data) {
     var hier_data = d3.nest()
         .key(function(d) { return d.attrs.filename })
         .entries(data.nodes);
-    console.log(hier_data);
 
     div.data([{'key': 'root', 'values':hier_data}]).selectAll("div")
         .data(treemap.nodes)
@@ -51,6 +50,24 @@ startDrawing = function(data) {
             .style("border", "solid 1px white")
         ;
     }
+
+    var svg = d3.select("#overlay");
+    svg.selectAll("line")
+        .data(data.edges)
+        .enter().append("line")
+        .attr("x1", function(d) { var n = data.nodes[d.source]; return n.x + (n.dx/2) })
+        .attr("y1", function(d) { var n = data.nodes[d.source]; return n.y + (n.dy/2) })
+        .attr("x2", function(d) { var n = data.nodes[d.source]; return n.x + (n.dx/2) })
+        .attr("y2", function(d) { var n = data.nodes[d.source]; return n.y + (n.dy/2) })
+        .style("stroke", "#777")
+        .style("stroke-width", "1")
+        .style("stroke-opacity", 0.4)
+        .transition()
+        .duration(1000)
+        .attr("x2", function(d) { var n = data.nodes[d.target]; return n.x + (n.dx/2) })
+        .attr("y2", function(d) { var n = data.nodes[d.target]; return n.y + (n.dy/2) })
+
+    ;
 }
 
 fetchData = function() {

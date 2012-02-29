@@ -10,8 +10,11 @@
   <button id="time">Time</button>
   <p/>
     
-   <div id="treemap" style="width: 1600px; height: 1600px; position:relative">
+   <div id="treemap-outer" style="width: 1200px; height: 1200px; position:relative">
+     <div id="treemap"></div>
+   <svg id="overlay" width="1200" height="1200" style="z-index: 1; position:absolute"/>
+
    </div>
-  <script>fetchData()</script>
+   <script>fetchData()</script>
 </body>
 </html>
