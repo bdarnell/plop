@@ -2,25 +2,12 @@
 <html>
 <head>
 <title>Plop Viewer</title>
-<script src="/static/d3.v2.js"></script>
-<script src="/static/plop.js"></script>
 </head>
 <body>
-  <button id="calls">Calls</button>
-  <button id="time">Time</button>
-  <svg width="1000" height="1000" id="graph">
-    <defs>
-      <!-- from http://www.w3.org/TR/SVG/painting.html#Markers -->
-      <!-- Increasing refX moves the marker away from the end of the line -->
-      <marker id="Triangle"
-              viewBox="0 0 10 10" refX="30" refY="5"
-              markerUnits="strokeWidth"
-              markerWidth="4" markerHeight="3"
-              orient="auto">
-        <path d="M 0 0 L 10 5 L 0 10 z" />
-      </marker>
-    </defs>
-  </svg>
-  <script>fetchData()</script>
+<ul>
+<li><a href="/treemap">Treemap</a></li>
+<li><a href="/force">Force-driected graph</a></li>
+<li><a href="/circles">Packed circles</a></li>
+</ul>
 </body>
 </html>

@@ -17,6 +17,10 @@ class IndexHandler(RequestHandler):
     def get(self):
         self.render('index.html')
 
+class ViewHandler(RequestHandler):
+    def get(self, view):
+        self.render('%s.html' % view)
+
 class DataHandler(RequestHandler):
     def initialize(self, graph):
         self.graph = graph
@@ -41,6 +45,7 @@ def main():
 
     handlers = [
         ('/', IndexHandler),
+        ('/(treemap|force|circles)', ViewHandler),
         ('/data', DataHandler, dict(graph=graph)),
         ]
 
