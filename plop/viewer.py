@@ -6,6 +6,7 @@ from tornado.ioloop import IOLoop
 from tornado.options import define, options, parse_command_line
 from tornado.web import RequestHandler, Application
 
+from plop.callgraph import CallGraph
 from plop.pstats_loader import load_pstats
 
 define('port', default=8888)
@@ -28,8 +29,7 @@ class DataHandler(RequestHandler):
     def get(self):
         MAX_NODES = 200
         nodes=[dict(attrs=node.attrs, weights=node.weights, id=node.id)
-               for node in self.graph.nodes.itervalues()
-               if 'tornado' in node.attrs['fullpath']]
+               for node in self.graph.nodes.itervalues()]
         nodes = sorted(nodes, key=lambda n: -n['weights']['calls'])[:MAX_NODES]
         index = {node['id']: i for i, node in enumerate(nodes)}
         edges = [dict(source=index[edge.parent.id],
@@ -41,7 +41,10 @@ class DataHandler(RequestHandler):
 def main():
     parse_command_line()
 
-    graph = load_pstats(options.data)
+    if options.data.endswith('.pstats'):
+        graph = load_pstats(options.data)
+    else:
+        graph = CallGraph.load(options.data)
 
     handlers = [
         ('/', IndexHandler),

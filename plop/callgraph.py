@@ -72,3 +72,19 @@ class CallGraph(object):
                               key=lambda n: n.weights.get(weight, 0),
                               reverse=True)
         return sorted_nodes[:num]
+
+    @staticmethod
+    def load(filename):
+        import ast
+        with open(filename) as f:
+            data = ast.literal_eval(f.read())
+        graph = CallGraph()
+        for stack, count in data.iteritems():
+            stack_nodes = [Node(id=frame, attrs=dict(fullpath=frame[0],
+                                                     filename=frame[0].rpartition('/')[-1],
+                                                     lineno=frame[1],
+                                                     funcname=frame[2]))
+                           for frame in reversed(stack)]
+            # TODO: this shouldn't be recorded as "calls"
+            graph.add_stack(stack_nodes, weights=dict(calls=count))
+        return graph
