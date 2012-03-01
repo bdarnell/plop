@@ -22,7 +22,7 @@ startDrawing = function(data) {
     gnodes.append("title")
         .text(function(d) { return d.attrs.filename + ":" + d.attrs.lineno + ":" + d.attrs.funcname + ": " + d.weights.calls });
     var circles = gnodes.append("circle")
-        .attr("r", function(d) { return 4*Math.log(d.weights.calls) })
+        .attr("r", function(d) { return d.weights.calls ? 20*Math.log(d.weights.calls) : 20 })
         .attr("fill", function(d) {return fill(d.attrs.filename) });
     var texts = gnodes.append("text")
         .text(function(d) { return d.attrs.funcname })
@@ -34,7 +34,7 @@ startDrawing = function(data) {
     var links = svg.selectAll("line")
         .data(data.edges)
         .enter().append("line")
-        .style("stroke-width", 3)
+        .style("stroke-width", function(d) { return Math.max(1, Math.log(d.weights.calls)) })
         .style("stroke", "#777")
         .style("stroke-opacity", 0.4)
         .attr("marker-end", "url(#Triangle)");

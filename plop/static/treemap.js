@@ -67,7 +67,7 @@ startDrawing = function(data) {
                 .attr("x2", function(d) { var n = data.nodes[d.source]; return n.x + (n.dx/2) })
                 .attr("y2", function(d) { var n = data.nodes[d.source]; return n.y + (n.dy/2) })
                 .style("stroke", "#000")
-                .style("stroke-width", "3")
+                .style("stroke-width", function(d) { return Math.max(1, Math.log(d.weights.calls)) })
                 .style("stroke-opacity", 0.6)
                 .attr("marker-end", "url(#Triangle)")
                 .transition()
