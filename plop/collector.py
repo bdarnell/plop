@@ -1,5 +1,6 @@
 import collections
 import signal
+import sys
 import time
 from plop import platform
 
@@ -45,4 +46,33 @@ class Collector(object):
         end = time.time()
         self.samples_taken += 1
         self.sample_time += (end - start)
+
+def main():
+    # TODO: support the usual runpy rigamarole, more options
+    if len(sys.argv) >= 3 and sys.argv[1] == '-m':
+        mode = 'module'
+        module = sys.argv[2]
+        del sys.argv[1:3]
+    else:
+        print "usage: python -m plop.collector -m module_to_run"
+        sys.exit(1)
+    
+
+    collector = Collector()
+    collector.start(duration=3600)
+    exit_code = 0
+    try:
+        if mode == "module":
+            import runpy
+            runpy.run_module(module, run_name="__main__", alter_sys=True)
+    except SystemExit, e:
+        exit_code = e.code
+    collector.stop()
+    with open('/tmp/plop.out', 'w') as f:
+        f.write(repr(dict(collector.stack_counts)))
+    print "profile output saved to /tmp/plop.out"
+    sys.exit(exit_code)
+
+if __name__ == '__main__':
+    main()
 
