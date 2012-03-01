@@ -3,7 +3,7 @@ import os
 import pprint
 from tornado.testing import LogTrapTestCase
 
-from plop.pstats import load_pstats
+from plop.pstats_loader import load_pstats
 
 class TornadoPstatsTest(LogTrapTestCase):
     def setUp(self):
