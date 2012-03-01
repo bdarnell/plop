@@ -3,9 +3,9 @@ import signal
 if hasattr(signal, 'setitimer'):
     from signal import setitimer, ITIMER_REAL, ITIMER_VIRTUAL, ITIMER_PROF
 else:
-    # python2.5 doesn't have setitimer.  linux-only workaround
-    import ctypes
-    libc = ctypes.CDLL("libc.so.6")
+    # python2.5 doesn't have setitimer
+    import ctypes.util
+    libc = ctypes.CDLL(ctypes.util.find_library("c"))
     class Timeval(ctypes.Structure):
         _fields_ = [('tv_sec', ctypes.c_long), ('tv_usec', ctypes.c_long)]
     class Itimerval(ctypes.Structure):
