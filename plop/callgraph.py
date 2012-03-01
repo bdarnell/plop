@@ -38,6 +38,10 @@ class Edge(object):
         self.weights += other.weights
         return self
 
+class Stack(object):
+    def __init__(self, nodes, weights):
+        self.nodes = nodes
+        self.weights = Counter(weights)
 
 
 class CallGraph(object):
@@ -45,10 +49,12 @@ class CallGraph(object):
         # map Node.id: Node
         self.nodes = {}
         self.edges = {}
+        self.stacks = []
 
     def add_stack(self, nodes, weights):
         nodes = [self.nodes.setdefault(n.id, n) for n in nodes]
         weights = Counter(weights)
+        self.stacks.append(Stack(nodes, weights))
         
         for i in range(len(nodes) - 1):
             parent = nodes[i]

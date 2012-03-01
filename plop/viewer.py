@@ -27,16 +27,23 @@ class DataHandler(RequestHandler):
         self.graph = graph
     
     def get(self):
-        MAX_NODES = 200
+        total = sum(stack.weights['calls'] for stack in self.graph.stacks)
+        top_stacks = [stack for stack in self.graph.stacks if stack.weights['calls'] > total*.005]
+        filtered_nodes = set()
+        for stack in top_stacks:
+            filtered_nodes.update(stack.nodes)
         nodes=[dict(attrs=node.attrs, weights=node.weights, id=node.id)
-               for node in self.graph.nodes.itervalues()]
-        nodes = sorted(nodes, key=lambda n: -n['weights']['calls'])[:MAX_NODES]
+               for node in filtered_nodes]
+        nodes = sorted(nodes, key=lambda n: -n['weights']['calls'])
         index = {node['id']: i for i, node in enumerate(nodes)}
         edges = [dict(source=index[edge.parent.id],
                       target=index[edge.child.id],
                       weights=edge.weights)
-                 for edge in self.graph.edges.itervalues() if edge.parent.id in index and edge.child.id in index]
-        self.write(dict(nodes=nodes, edges=edges))
+                 for edge in self.graph.edges.itervalues()]
+        stacks = [dict(nodes=[index[n.id] for n in stack.nodes],
+                       weights=stack.weights)
+                  for stack in top_stacks]
+        self.write(dict(nodes=nodes, edges=edges, stacks=stacks))
 
 def main():
     parse_command_line()
