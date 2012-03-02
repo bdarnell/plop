@@ -6,8 +6,8 @@ from plop.collector import Collector
 class CollectorTest(unittest.TestCase):
     def test_collector(self):
         start = time.time()
-        collector = Collector()
-        collector.start(interval=0.01)
+        collector = Collector(interval=0.01)
+        collector.start()
         def a(end):
             while time.time() < end: pass
             c(time.time() + 0.1)
