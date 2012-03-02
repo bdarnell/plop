@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import logging
 import os
 
 from tornado.ioloop import IOLoop
@@ -39,7 +40,8 @@ class DataHandler(RequestHandler):
         edges = [dict(source=index[edge.parent.id],
                       target=index[edge.child.id],
                       weights=edge.weights)
-                 for edge in self.graph.edges.itervalues()]
+                 for edge in self.graph.edges.itervalues()
+                 if edge.parent.id in index and edge.child.id in index]
         stacks = [dict(nodes=[index[n.id] for n in stack.nodes],
                        weights=stack.weights)
                   for stack in top_stacks]
@@ -52,6 +54,7 @@ def main():
         graph = load_pstats(options.data)
     else:
         graph = CallGraph.load(options.data)
+    logging.info("loaded call graph")
 
     handlers = [
         ('/', IndexHandler),

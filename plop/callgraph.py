@@ -94,3 +94,7 @@ class CallGraph(object):
             # TODO: this shouldn't be recorded as "calls"
             graph.add_stack(stack_nodes, weights=dict(calls=count))
         return graph
+
+if __name__ == '__main__':
+    import sys
+    graph = CallGraph.load(sys.argv[1])
