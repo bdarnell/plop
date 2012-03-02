@@ -1,11 +1,14 @@
 // based on http://mbostock.github.com/d3/ex/bubble.html
 startDrawing = function(data) {
-    var r = 1600;
+    var r = 3200;
     var svg = d3.select("#graph");
+    function node_weight(d) {
+        return d.weights.calls ? Math.log(d.weights.calls) : 1;
+    }
     console.log("creating force");
     var force = d3.layout.force()
-        .charge(-320)
-        .linkDistance(200)
+        .charge(function(d) { return -1000 * node_weight(d) })
+        .linkDistance(function(d) { return 25 * node_weight(d) })
         .size([r,r])
         .nodes(data.nodes)
         .links(data.edges)
@@ -22,7 +25,7 @@ startDrawing = function(data) {
     gnodes.append("title")
         .text(function(d) { return d.attrs.filename + ":" + d.attrs.lineno + ":" + d.attrs.funcname + ": " + d.weights.calls });
     var circles = gnodes.append("circle")
-        .attr("r", function(d) { return d.weights.calls ? 20*Math.log(d.weights.calls) : 20 })
+        .attr("r", function(d) { return 20 * node_weight(d) })
         .attr("fill", function(d) {return fill(d.attrs.filename) });
     var texts = gnodes.append("text")
         .text(function(d) { return d.attrs.funcname })
