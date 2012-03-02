@@ -29,7 +29,8 @@ class DataHandler(RequestHandler):
     
     def get(self):
         total = sum(stack.weights['calls'] for stack in self.graph.stacks)
-        top_stacks = [stack for stack in self.graph.stacks if stack.weights['calls'] > total*.005]
+        top_stacks = self.graph.stacks
+        #top_stacks = [stack for stack in self.graph.stacks if stack.weights['calls'] > total*.005]
         filtered_nodes = set()
         for stack in top_stacks:
             filtered_nodes.update(stack.nodes)
@@ -55,6 +56,8 @@ def main():
     else:
         graph = CallGraph.load(options.data)
     logging.info("loaded call graph")
+    import tornado.autoreload
+    tornado.autoreload.watch(options.data)
 
     handlers = [
         ('/', IndexHandler),
