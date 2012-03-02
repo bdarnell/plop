@@ -58,6 +58,14 @@ class Collector(object):
         self.samples_taken += 1
         self.sample_time += (end - start)
 
+    def filter(self, threshold):
+        """Discards stacks that used less than ``threshold`` (as a fraction
+        of the total time.
+        """
+        total = sum(count for count in self.stack_counts.itervalues())
+        self.stack_counts = dict((k,v) for (k,v) in self.stack_counts.iteritems()
+                                 if v > total * threshold)
+
 def main():
     # TODO: more options, refactor this into somewhere shared
     # between tornado.autoreload and auto2to3
@@ -92,6 +100,7 @@ def main():
     except SystemExit, e:
         exit_code = e.code
     collector.stop()
+    collector.filter(0.005)
     with open('/tmp/plop.out', 'w') as f:
         f.write(repr(dict(collector.stack_counts)))
     print "profile output saved to /tmp/plop.out"
