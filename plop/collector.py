@@ -6,8 +6,16 @@ import time
 from plop import platform
 
 class Collector(object):
-    def __init__(self, interval=0.01):
+    MODES = {
+        'prof': (platform.ITIMER_PROF, signal.SIGPROF),
+        'virtual': (platform.ITIMER_VIRTUAL, signal.SIGVTALRM),
+        'real': (platform.ITIMER_REAL, signal.SIGALRM),
+        }
+
+    def __init__(self, interval=0.01, mode='virtual'):
         self.interval = interval
+        self.mode = mode
+        assert mode in Collector.MODES
         # defaultdict instead of counter for pre-2.7 compatibility
         self.stack_counts = collections.defaultdict(int)
         self.samples_remaining = 0
@@ -21,8 +29,9 @@ class Collector(object):
         self.stopping = False
         self.stopped = False
         self.samples_remaining = int(duration / self.interval)
-        signal.signal(signal.SIGPROF, self.handler)
-        platform.setitimer(platform.ITIMER_PROF, self.interval, self.interval)
+        timer, sig = Collector.MODES[self.mode]
+        signal.signal(sig, self.handler)
+        platform.setitimer(timer, self.interval, self.interval)
 
     def stop(self):
         self.stopping = True
