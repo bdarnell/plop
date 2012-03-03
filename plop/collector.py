@@ -2,6 +2,7 @@ from __future__ import with_statement
 import collections
 import signal
 import sys
+import thread
 import time
 from plop import platform
 
@@ -41,19 +42,23 @@ class Collector(object):
         while not self.stopped:
             pass # need busy wait; ITIMER_PROF doesn't proceed while sleeping
 
-    def handler(self, sig, frame):
+    def handler(self, sig, current_frame):
         start = time.time()
         self.samples_remaining -= 1
         if self.samples_remaining <= 0 or self.stopping:
-            platform.setitimer(platform.ITIMER_PROF, 0, 0)
+            platform.setitimer(Collector.MODES[self.mode][0], 0, 0)
             self.stopped = True
             return
-        frames = []
-        while frame is not None:
-            code = frame.f_code
-            frames.append((code.co_filename, code.co_firstlineno, code.co_name))
-            frame = frame.f_back
-        self.stack_counts[tuple(frames)] += 1
+        current_tid = thread.get_ident()
+        for tid, frame in sys._current_frames().items():
+            if tid == current_tid:
+                frame = current_frame
+            frames = []
+            while frame is not None:
+                code = frame.f_code
+                frames.append((code.co_filename, code.co_firstlineno, code.co_name))
+                frame = frame.f_back
+            self.stack_counts[tuple(frames)] += 1
         end = time.time()
         self.samples_taken += 1
         self.sample_time += (end - start)
