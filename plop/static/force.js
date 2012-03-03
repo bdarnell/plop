@@ -2,6 +2,7 @@
 startDrawing = function(data) {
     var r = 3200;
     var svg = d3.select("#graph");
+    svg.attr("width", r).attr("height", r);
     function node_weight(d) {
         return d.weights.calls ? Math.log(d.weights.calls) : 1;
     }
