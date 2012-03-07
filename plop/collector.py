@@ -17,6 +17,11 @@ class Collector(object):
         self.interval = interval
         self.mode = mode
         assert mode in Collector.MODES
+        timer, sig = Collector.MODES[self.mode]
+        signal.signal(sig, self.handler)
+        self.reset()
+
+    def reset(self):
         # defaultdict instead of counter for pre-2.7 compatibility
         self.stack_counts = collections.defaultdict(int)
         self.samples_remaining = 0
@@ -31,7 +36,6 @@ class Collector(object):
         self.stopped = False
         self.samples_remaining = int(duration / self.interval)
         timer, sig = Collector.MODES[self.mode]
-        signal.signal(sig, self.handler)
         platform.setitimer(timer, self.interval, self.interval)
 
     def stop(self):
