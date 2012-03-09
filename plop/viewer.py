@@ -21,7 +21,8 @@ class IndexHandler(RequestHandler):
         for filename in os.listdir(options.datadir):
             mtime = os.stat(os.path.join(options.datadir, filename)).st_mtime
             files.append((mtime, filename))
-        files.sort()
+        # sort by descending mtime then ascending filename
+        files.sort(key=lambda x: (-x[0], x[1]))
         self.render('index.html', files=[f[1] for f in files])
 
 class ViewHandler(RequestHandler):
