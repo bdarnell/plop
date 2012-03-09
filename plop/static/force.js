@@ -58,6 +58,6 @@ startDrawing = function(data) {
     });
 }
 
-fetchData = function() {
-    d3.json('/data', startDrawing);
+fetchData = function(filename) {
+    d3.json('/data?filename=' + filename, startDrawing);
 }

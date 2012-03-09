@@ -13,24 +13,32 @@ from plop.pstats_loader import load_pstats
 define('port', default=8888)
 define('debug', default=False)
 define('address', default='')
-define('data', default=os.path.join(os.path.dirname(__file__), 'test/testdata/tornado_tests.pstats'))
+define('datadir', default=os.path.join(os.path.dirname(__file__), 'test/testdata/'))
 
 class IndexHandler(RequestHandler):
     def get(self):
-        self.render('index.html')
+        files = []
+        for filename in os.listdir(options.datadir):
+            mtime = os.stat(os.path.join(options.datadir, filename)).st_mtime
+            files.append((mtime, filename))
+        files.sort()
+        self.render('index.html', files=[f[1] for f in files])
 
 class ViewHandler(RequestHandler):
     def get(self, view):
-        self.render('%s.html' % view)
+        self.render('%s.html' % view, filename=self.get_argument("filename"))
 
 class DataHandler(RequestHandler):
-    def initialize(self, graph):
-        self.graph = graph
-    
     def get(self):
-        total = sum(stack.weights['calls'] for stack in self.graph.stacks)
-        top_stacks = self.graph.stacks
-        #top_stacks = [stack for stack in self.graph.stacks if stack.weights['calls'] > total*.005]
+        root = os.path.abspath(options.datadir) + os.path.sep
+        filename = self.get_argument("filename")
+        abspath = os.path.abspath(os.path.join(root, filename))
+        assert (abspath + os.path.sep).startswith(root)
+        graph = CallGraph.load(abspath)
+
+        total = sum(stack.weights['calls'] for stack in graph.stacks)
+        top_stacks = graph.stacks
+        #top_stacks = [stack for stack in graph.stacks if stack.weights['calls'] > total*.005]
         filtered_nodes = set()
         for stack in top_stacks:
             filtered_nodes.update(stack.nodes)
@@ -41,7 +49,7 @@ class DataHandler(RequestHandler):
         edges = [dict(source=index[edge.parent.id],
                       target=index[edge.child.id],
                       weights=edge.weights)
-                 for edge in self.graph.edges.itervalues()
+                 for edge in graph.edges.itervalues()
                  if edge.parent.id in index and edge.child.id in index]
         stacks = [dict(nodes=[index[n.id] for n in stack.nodes],
                        weights=stack.weights)
@@ -51,18 +59,10 @@ class DataHandler(RequestHandler):
 def main():
     parse_command_line()
 
-    if options.data.endswith('.pstats'):
-        graph = load_pstats(options.data)
-    else:
-        graph = CallGraph.load(options.data)
-    logging.info("loaded call graph")
-    import tornado.autoreload
-    tornado.autoreload.watch(options.data)
-
     handlers = [
         ('/', IndexHandler),
         ('/(treemap|force|circles)', ViewHandler),
-        ('/data', DataHandler, dict(graph=graph)),
+        ('/data', DataHandler),
         ]
 
     settings=dict(

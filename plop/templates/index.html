@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Plop Viewer</title>
+<title>Profile Viewer</title>
 </head>
 <body>
-<ul>
-<li><a href="/treemap">Treemap</a></li>
-<li><a href="/force">Force-driected graph</a></li>
-<li><a href="/circles">Packed circles</a></li>
-</ul>
+  <ul>
+    {% for f in files %}
+    <li><a href="/force?filename={{f}}">{{f}}</a></li>
+    {% end for %}
+  </ul>
 </body>
 </html>
