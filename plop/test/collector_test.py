@@ -15,6 +15,26 @@ class CollectorTest(unittest.TestCase):
                 counts[tuple(filtered_stack)] = count
         return counts
         
+    def check_counts(self, counts, expected):
+        failed = False
+        output = []
+        for stack, count in expected.items():
+            # every expected frame should appear in the data, but
+            # the inverse is not true if the signal catches us between
+            # calls.
+            self.assertTrue(stack in counts)
+            ratio = float(counts[stack])/float(count)
+            output.append('%s: expected %s, got %s (%s)' % 
+                          (stack, count, counts[stack], ratio))
+            if not (0.70 <= ratio <= 1.25):
+                failed = True
+        if failed:
+            for line in output:
+                logging.warning(line)
+            for key in set(counts.keys()) - set(expected.keys()):
+                logging.warning('unexpected key: %s: got %s' % (key, counts[key]))
+            self.fail("collected data did not meet expectations")
+
     def test_collector(self):
         start = time.time()
         def a(end):
@@ -44,15 +64,7 @@ class CollectorTest(unittest.TestCase):
             ('c', 'b', 'test_collector'): 10,
             ('c', 'test_collector'): 30,
             }
-        for stack, count in expected.items():
-            # every expected frame should appear in the data, but
-            # the inverse is not true if the signal catches us between
-            # calls.
-            self.assertTrue(stack in counts)
-            ratio = float(counts[stack])/float(count)
-            self.assertTrue(0.70 <= ratio <= 1.25,
-                            "expected %s, got %s (%s)" % 
-                            (count, counts[stack], ratio))
+        self.check_counts(counts, expected)
 
         # cost depends on stack depth; for this tiny test I see 40-80usec
         time_per_sample = float(collector.sample_time) / collector.samples_taken
@@ -89,9 +101,4 @@ class CollectorTest(unittest.TestCase):
             ('a', 'thread1_func'): 20,
             ('a', 'thread2_func'): 30,
             }
-        for stack, count in expected.items():
-            self.assertTrue(stack in counts, stack)
-            ratio = float(counts[stack])/float(count)
-            self.assertTrue(0.70 <= ratio <= 1.25,
-                            "expected %s, got %s (%s)" %
-                            (count, counts[stack], ratio))
+        self.check_counts(counts, expected)
