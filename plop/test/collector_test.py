@@ -45,7 +45,7 @@ class CollectorTest(unittest.TestCase):
             c(time.time() + 0.1)
         def c(end):
             while time.time() < end: pass
-        collector = Collector(interval=0.01)
+        collector = Collector(interval=0.01, mode='prof')
         collector.start()
         a(time.time() + 0.1)
         b(time.time() + 0.2)
@@ -78,7 +78,7 @@ class CollectorTest(unittest.TestCase):
             a(time.time() + 0.2)
         def thread2_func():
             a(time.time() + 0.3)
-        collector = Collector()
+        collector = Collector(interval=0.01, mode='prof')
         collector.start()
         thread1 = threading.Thread(target=thread1_func)
         thread2 = threading.Thread(target=thread2_func)
