@@ -35,4 +35,4 @@ class ItimerTests(unittest.TestCase):
         # We should have gotten ~50 timer ticks while we waited.
         # in practice I see ~44 on my mac, and ~48 on a linux
         # vm running on that same mac (?!)
-        self.assertTrue(40 < count < 55, count)
+        self.assertTrue(37 < count < 55, count)
