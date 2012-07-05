@@ -8,7 +8,7 @@ startDrawing = function(data) {
     }
     console.log("creating force");
     var force = d3.layout.force()
-        .charge(function(d) { return -1000 * node_weight(d) })
+        .charge(function(d) { return -500 * node_weight(d) })
         .linkDistance(function(d) { return 25 * node_weight(d) })
         .size([r,r])
         .nodes(data.nodes)

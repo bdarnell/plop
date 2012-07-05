@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from collections import Counter
 import logging
 import os
 
@@ -47,11 +48,27 @@ class DataHandler(RequestHandler):
                for node in filtered_nodes]
         nodes = sorted(nodes, key=lambda n: -n['weights']['calls'])
         index = {node['id']: i for i, node in enumerate(nodes)}
+
+        # High-degree nodes are generally common utility functions, and
+        # creating edges from all over the graph tends to obscure more than
+        # it helps.
+        degrees = Counter()
+        dropped = set()
+        for edge in graph.edges.itervalues():
+            degrees[edge.child.id] += 1
+            degrees[edge.parent.id] += 1
+        for node, degree in degrees.iteritems():
+            if degree > 6:
+                dropped.add(node)
+
         edges = [dict(source=index[edge.parent.id],
                       target=index[edge.child.id],
                       weights=edge.weights)
                  for edge in graph.edges.itervalues()
-                 if edge.parent.id in index and edge.child.id in index]
+                 if (edge.parent.id in index and
+                     edge.child.id in index and
+                     edge.parent.id not in dropped and
+                     edge.child.id not in dropped)]
         stacks = [dict(nodes=[index[n.id] for n in stack.nodes],
                        weights=stack.weights)
                   for stack in top_stacks]
@@ -75,6 +92,6 @@ def main():
     app = Application(handlers, **settings)
     app.listen(options.port, address=options.address)
     IOLoop.instance().start()
-    
+
 if __name__ == '__main__':
     main()

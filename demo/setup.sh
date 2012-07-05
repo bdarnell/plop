@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
 if [[ ! -f ~/envs/plop-demo/bin/activate ]]; then
-    virtualenv --no-site-packages ~/envs/plop-demo
+    virtualenv -p python2.7 --no-site-packages ~/envs/plop-demo
 fi
 source ~/envs/plop-demo/bin/activate
 
