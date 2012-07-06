@@ -2,8 +2,10 @@
 <html>
 <head>
 <title>Profile view</title>
-<script src="/static/d3.v2.js"></script>
-<script src="/static/force.js"></script>
+<script>
+{% raw handler.embed_file("d3.v2.js") %}
+{% raw handler.embed_file("force.js") %}
+</script>
 </head>
 <body>
   <svg id="graph">
@@ -19,6 +21,9 @@
       </marker>
     </defs>
   </svg>
-  <script>fetchData("{{url_escape(filename)}}")</script>
+  <script>
+    var data = {% raw json_encode(data) %};
+    startDrawing(data);
+  </script>
 </body>
 </html>

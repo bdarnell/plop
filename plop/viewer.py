@@ -27,59 +27,71 @@ class IndexHandler(RequestHandler):
         self.render('index.html', files=[f[1] for f in files])
 
 class ViewHandler(RequestHandler):
-    def get(self, view):
-        self.render('%s.html' % view, filename=self.get_argument("filename"))
+    def get(self):
+        self.render('force.html', filename=self.get_argument("filename"))
+
+class ViewFlatHandler(RequestHandler):
+    def get(self):
+        self.render('force-flat.html',
+                    data=profile_to_json(self.get_argument('filename')))
+
+    def embed_file(self, filename):
+        with open(os.path.join(self.settings['static_path'], filename)) as f:
+            return f.read()
 
 class DataHandler(RequestHandler):
     def get(self):
-        root = os.path.abspath(options.datadir) + os.path.sep
-        filename = self.get_argument("filename")
-        abspath = os.path.abspath(os.path.join(root, filename))
-        assert (abspath + os.path.sep).startswith(root)
-        graph = CallGraph.load(abspath)
+        self.write(profile_to_json(self.get_argument('filename')))
 
-        total = sum(stack.weights['calls'] for stack in graph.stacks)
-        top_stacks = graph.stacks
-        #top_stacks = [stack for stack in graph.stacks if stack.weights['calls'] > total*.005]
-        filtered_nodes = set()
-        for stack in top_stacks:
-            filtered_nodes.update(stack.nodes)
-        nodes=[dict(attrs=node.attrs, weights=node.weights, id=node.id)
-               for node in filtered_nodes]
-        nodes = sorted(nodes, key=lambda n: -n['weights']['calls'])
-        index = {node['id']: i for i, node in enumerate(nodes)}
+def profile_to_json(filename):
+    root = os.path.abspath(options.datadir) + os.path.sep
+    abspath = os.path.abspath(os.path.join(root, filename))
+    assert (abspath + os.path.sep).startswith(root)
+    graph = CallGraph.load(abspath)
 
-        # High-degree nodes are generally common utility functions, and
-        # creating edges from all over the graph tends to obscure more than
-        # it helps.
-        degrees = Counter()
-        dropped = set()
-        for edge in graph.edges.itervalues():
-            degrees[edge.child.id] += 1
-            degrees[edge.parent.id] += 1
-        for node, degree in degrees.iteritems():
-            if degree > 6:
-                dropped.add(node)
+    total = sum(stack.weights['calls'] for stack in graph.stacks)
+    top_stacks = graph.stacks
+    #top_stacks = [stack for stack in graph.stacks if stack.weights['calls'] > total*.005]
+    filtered_nodes = set()
+    for stack in top_stacks:
+        filtered_nodes.update(stack.nodes)
+    nodes=[dict(attrs=node.attrs, weights=node.weights, id=node.id)
+           for node in filtered_nodes]
+    nodes = sorted(nodes, key=lambda n: -n['weights']['calls'])
+    index = {node['id']: i for i, node in enumerate(nodes)}
 
-        edges = [dict(source=index[edge.parent.id],
-                      target=index[edge.child.id],
-                      weights=edge.weights)
-                 for edge in graph.edges.itervalues()
-                 if (edge.parent.id in index and
-                     edge.child.id in index and
-                     edge.parent.id not in dropped and
-                     edge.child.id not in dropped)]
-        stacks = [dict(nodes=[index[n.id] for n in stack.nodes],
-                       weights=stack.weights)
-                  for stack in top_stacks]
-        self.write(dict(nodes=nodes, edges=edges, stacks=stacks))
+    # High-degree nodes are generally common utility functions, and
+    # creating edges from all over the graph tends to obscure more than
+    # it helps.
+    degrees = Counter()
+    dropped = set()
+    for edge in graph.edges.itervalues():
+        degrees[edge.child.id] += 1
+        degrees[edge.parent.id] += 1
+    for node, degree in degrees.iteritems():
+        if degree > 6:
+            dropped.add(node)
+
+    edges = [dict(source=index[edge.parent.id],
+                  target=index[edge.child.id],
+                  weights=edge.weights)
+             for edge in graph.edges.itervalues()
+             if (edge.parent.id in index and
+                 edge.child.id in index and
+                 edge.parent.id not in dropped and
+                 edge.child.id not in dropped)]
+    stacks = [dict(nodes=[index[n.id] for n in stack.nodes],
+                   weights=stack.weights)
+              for stack in top_stacks]
+    return dict(nodes=nodes, edges=edges, stacks=stacks)
 
 def main():
     parse_command_line()
 
     handlers = [
         ('/', IndexHandler),
-        ('/(treemap|force|circles)', ViewHandler),
+        ('/view', ViewHandler),
+        ('/view-flat', ViewFlatHandler),
         ('/data', DataHandler),
         ]
 
