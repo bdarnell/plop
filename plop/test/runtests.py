@@ -10,7 +10,6 @@ COMMON_TESTS = [
 
 VIEWER_TESTS = [
     'plop.test.callgraph_test',
-    'plop.test.pstats_loader_test',
     ]
 
 # Viewer currently requires python 2.7 (for collections.Counter, could
