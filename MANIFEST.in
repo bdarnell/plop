@@ -1,0 +1,2 @@
+recursive-include plop *.html *.js
+include LICENSE.txt

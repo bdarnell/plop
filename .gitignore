@@ -2,4 +2,5 @@
 .tox
 MANIFEST
 .vagrant
+dist
 
