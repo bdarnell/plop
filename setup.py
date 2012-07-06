@@ -8,7 +8,7 @@ setup(
             "templates/index.html",
             "templates/force.html",
             "static/force.js",
-            "static/d3.v2.js",
+            "static/third_party/d3/d3.v2.js",
             ],
         }
     )
