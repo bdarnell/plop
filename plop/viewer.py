@@ -9,7 +9,6 @@ from tornado.options import define, options, parse_command_line
 from tornado.web import RequestHandler, Application
 
 from plop.callgraph import CallGraph
-from plop.pstats_loader import load_pstats
 
 define('port', default=8888)
 define('debug', default=False)
