@@ -32,6 +32,11 @@ call ``start()``, wait, then ``stop()``.  Dump ``collector.stack_counts``
 to a file.  See ``ProfileHandler`` in ``demo/busy_server.py`` for an example
 of how to trigger profiling via an HTTP interface.
 
+Or you can add a ``@plop()`` decorator to the functions that you wish to
+profile. To import this decorator do ``from plop.decorator import plop``. The
+decorator will default to writing log data to the folder ``/tmp/plop``. 
+
+
 To use the viewer, run::
 
     python -m plop.viewer --datadir=demo/profiles
