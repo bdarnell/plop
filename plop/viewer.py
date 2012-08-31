@@ -13,7 +13,7 @@ from plop.callgraph import CallGraph
 define('port', default=8888)
 define('debug', default=False)
 define('address', default='')
-define('datadir', default=os.path.join(os.path.dirname(__file__), 'test/testdata/'))
+define('datadir', default='/tmp')
 
 class IndexHandler(RequestHandler):
     def get(self):
@@ -102,6 +102,7 @@ def main():
 
     app = Application(handlers, **settings)
     app.listen(options.port, address=options.address)
+    print "Access the viewer at http://localhost:8888"
     IOLoop.instance().start()
 
 if __name__ == '__main__':
