@@ -28,9 +28,17 @@ Usage
 -----
 
 In the application to be profiled, create a ``plop.collector.Collector``,
-call ``start()``, wait, then ``stop()``.  Dump ``collector.stack_counts``
-to a file.  See ``ProfileHandler`` in ``demo/busy_server.py`` for an example
-of how to trigger profiling via an HTTP interface.
+call ``start()``, wait, then ``stop()``.  Write
+``repr(dict(collector.stack_counts))`` to a file.  See ``ProfileHandler`` in
+``demo/busy_server.py`` for an example of how to trigger profiling via an HTTP
+interface.
+
+To profile an entire Python script, run::
+
+    python -m plop.collector myscript.py
+
+This will write the profile to ``/tmp/plop.out``
+
 
 To use the viewer, run::
 
