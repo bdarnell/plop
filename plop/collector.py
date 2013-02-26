@@ -28,7 +28,7 @@ class Collector(object):
         self.stopping = False
         self.stopped = False
 
-        self.samples_taken = 0
+        self.samples_taken = 1
         self.sample_time = 0
 
     def start(self, duration=30.0):
@@ -85,7 +85,7 @@ def main():
     else:
         print "usage: python -m plop.collector -m module_to_run"
         sys.exit(1)
-    
+
 
     collector = Collector()
     collector.start(duration=3600)

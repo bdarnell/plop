@@ -44,7 +44,10 @@ To use the viewer, run::
 
     python -m plop.viewer --datadir=demo/profiles
 
-and go to http://localhost:8888
+The default directory is your current working directory unless otherwise
+specified by "--datadir".
+
+Finally, go to http://localhost:8888 to see the plop call graph.
 
 Example
 -------
