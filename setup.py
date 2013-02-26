@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name="plop",
-    version="0.1.1",
+    version="0.1.2",
     packages=["plop", "plop.test"],
     package_data={
         "plop": [
@@ -14,4 +14,7 @@ setup(
         },
     author="Ben Darnell",
     url="https://github.com/bdarnell/plop",
-    )
+    install_requires=[
+	    "tornado",
+    ],
+ )
