@@ -13,7 +13,7 @@ from plop.callgraph import CallGraph
 define('port', default=8888)
 define('debug', default=False)
 define('address', default='')
-define('datadir', default=os.path.join('/tmp'))
+define('datadir', default=os.path.join(os.getcwd()))
 
 class IndexHandler(RequestHandler):
     def get(self):
