@@ -106,12 +106,15 @@ def main():
         exit_code = e.code
     collector.stop()
     collector.filter(50)
-    with open('/tmp/plop.out', 'w') as f:
-        f.write(repr(dict(collector.stack_counts)))
-    print "profile output saved to /tmp/plop.out"
-    overhead = float(collector.sample_time) / collector.samples_taken
-    print "overhead was %s per sample (%s%%)" % (
-        overhead, overhead / collector.interval)
+    if collector.samples_taken:
+        with open('/tmp/plop.out', 'w') as f:
+            f.write(repr(dict(collector.stack_counts)))
+        print "profile output saved to /tmp/plop.out"
+        overhead = float(collector.sample_time) / collector.samples_taken
+        print "overhead was %s per sample (%s%%)" % (
+            overhead, overhead / collector.interval)
+    else:
+        print "no samples collected; program was too fast"
     sys.exit(exit_code)
 
 if __name__ == '__main__':
