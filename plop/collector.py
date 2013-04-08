@@ -1,5 +1,6 @@
 from __future__ import with_statement
 import collections
+import os
 import signal
 import sys
 import thread
@@ -76,16 +77,19 @@ def main():
     # between tornado.autoreload and auto2to3
     if len(sys.argv) >= 3 and sys.argv[1] == '-m':
         mode = 'module'
-        module = sys.argv[2]
+        module = filename_base = sys.argv[2]
         del sys.argv[1:3]
     elif len(sys.argv) >= 2:
         mode = "script"
-        script = sys.argv[1]
+        script = filename_base = sys.argv[1]
         sys.argv = sys.argv[1:]
     else:
         print "usage: python -m plop.collector -m module_to_run"
         sys.exit(1)
-    
+    if not os.path.exists('profiles'):
+        os.mkdir('profiles')
+    filename = 'profiles/%s-%s.plop' % (filename_base,
+                                        time.strftime('%Y%m%d-%H%M-%S'))
 
     collector = Collector()
     collector.start(duration=3600)
@@ -107,9 +111,9 @@ def main():
     collector.stop()
     collector.filter(50)
     if collector.samples_taken:
-        with open('/tmp/plop.out', 'w') as f:
+        with open(filename, 'w') as f:
             f.write(repr(dict(collector.stack_counts)))
-        print "profile output saved to /tmp/plop.out"
+        print "profile output saved to %s" % filename
         overhead = float(collector.sample_time) / collector.samples_taken
         print "overhead was %s per sample (%s%%)" % (
             overhead, overhead / collector.interval)
