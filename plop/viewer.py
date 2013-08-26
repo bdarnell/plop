@@ -57,7 +57,9 @@ def profile_to_json(filename):
     nodes=[dict(attrs=node.attrs, weights=node.weights, id=node.id)
            for node in filtered_nodes]
     nodes = sorted(nodes, key=lambda n: -n['weights']['calls'])
-    index = {node['id']: i for i, node in enumerate(nodes)}
+    #index = {node['id']: i for i, node in enumerate(nodes)}
+    index = dict([(node['id'], i) for i, node in enumerate(nodes)])
+
 
     # High-degree nodes are generally common utility functions, and
     # creating edges from all over the graph tends to obscure more than
