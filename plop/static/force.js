@@ -61,3 +61,29 @@ startDrawing = function(data) {
 fetchData = function(filename) {
     d3.json('/data?filename=' + filename, startDrawing);
 }
+
+
+
+// Filtering
+
+function should_hide(d, filename, exclude) {
+	var found = d.id[0].toLowerCase().indexOf(filename)  != -1;
+	if (found && !exclude) {
+		return false;
+	} else if (!found && exclude) {
+		return false;
+	}
+	return true;
+}
+
+function filter(filename, exclude) {
+	var fill = d3.scale.category20c();
+	if (typeof exclude === undefined) {
+		exclude = false;
+	}
+	d3.selectAll("circle").style("opacity", function (d) {
+		return should_hide(d, filename, exclude) ? 0.15 : 1;
+	}).attr('fill', function (d) {
+		return should_hide(d, filename, exclude) ? '#999' : fill(d.attrs.filename);
+	});
+}
