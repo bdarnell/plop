@@ -46,6 +46,16 @@ To use the viewer, run::
 
 and go to http://localhost:8888
 
+Interpretation
+--------------
+
+Circle size is based on the amount of time that function was at the top of 
+the stack (i.e. time in that function, not any of its descendants). Arrow 
+thickness is based on how often that call was present anywhere in the stack. 
+
+In other words, the circle size corresponds to "time", and the arrow size 
+roughly corresponds to "cumulative time".
+
 Example
 -------
 
