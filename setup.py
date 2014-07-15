@@ -10,7 +10,7 @@ setup(
             "templates/force.html",
             "templates/force-flat.html",
             "static/force.js",
-            "static/third_party/d3/d3.v2.js",
+            "static/styles.css"
             ],
         },
     author="Ben Darnell",
