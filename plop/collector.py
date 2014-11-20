@@ -14,9 +14,10 @@ class Collector(object):
         'real': (platform.ITIMER_REAL, signal.SIGALRM),
         }
 
-    def __init__(self, interval=0.01, mode='virtual'):
+    def __init__(self, interval=0.01, mode='virtual', flamegraph=False):
         self.interval = interval
         self.mode = mode
+        self.flamegraph = flamegraph
         assert mode in Collector.MODES
         timer, sig = Collector.MODES[self.mode]
         signal.signal(sig, self.handler)
@@ -25,6 +26,7 @@ class Collector(object):
     def reset(self):
         # defaultdict instead of counter for pre-2.7 compatibility
         self.stack_counts = collections.defaultdict(int)
+        self.stacks = list()
         self.samples_remaining = 0
         self.stopping = False
         self.stopped = False
@@ -63,7 +65,10 @@ class Collector(object):
                 code = frame.f_code
                 frames.append((code.co_filename, code.co_firstlineno, code.co_name))
                 frame = frame.f_back
-            self.stack_counts[tuple(frames)] += 1
+            if self.flamegraph:
+                self.stacks.append(frames)
+            else:
+                self.stack_counts[tuple(frames)] += 1
         end = time.time()
         self.samples_taken += 1
         self.sample_time += (end - start)
@@ -75,6 +80,10 @@ class Collector(object):
 def main():
     # TODO: more options, refactor this into somewhere shared
     # between tornado.autoreload and auto2to3
+    flamegraph = False
+    if len(sys.argv) > 1 and sys.argv[1] == '-f':
+        flamegraph = True
+        del sys.argv[1]
     if len(sys.argv) >= 3 and sys.argv[1] == '-m':
         mode = 'module'
         module = filename_base = sys.argv[2]
@@ -84,14 +93,15 @@ def main():
         script = filename_base = sys.argv[1]
         sys.argv = sys.argv[1:]
     else:
-        print "usage: python -m plop.collector -m module_to_run"
+        print "usage: python -m plop.collector [-f] -m module_to_run"
         sys.exit(1)
+
     if not os.path.exists('profiles'):
         os.mkdir('profiles')
     filename = 'profiles/%s-%s.plop' % (filename_base,
                                         time.strftime('%Y%m%d-%H%M-%S'))
 
-    collector = Collector()
+    collector = Collector(flamegraph=flamegraph)
     collector.start(duration=3600)
     exit_code = 0
     try:
@@ -111,8 +121,11 @@ def main():
     collector.stop()
     collector.filter(50)
     if collector.samples_taken:
-        with open(filename, 'w') as f:
-            f.write(repr(dict(collector.stack_counts)))
+        if collector.flamegraph:
+            store_flamegraph(filename, collector)
+        else:
+            with open(filename, 'w') as f:
+                f.write(repr(dict(collector.stack_counts)))
         print "profile output saved to %s" % filename
         overhead = float(collector.sample_time) / collector.samples_taken
         print "overhead was %s per sample (%s%%)" % (
@@ -121,6 +134,27 @@ def main():
         print "no samples collected; program was too fast"
     sys.exit(exit_code)
 
+
+def format_flame(stack):
+    stack.reverse()
+    funcs = map(lambda stack: "%s (%s:%s)" % (stack[2], stack[0], stack[1]), stack)
+    return ";".join(funcs)
+
+
+def store_flamegraph(filename, collector):
+    with open(filename, 'w') as f:
+        previous = None
+        previous_count = 1
+        for stack in collector.stacks:
+            current = format_flame(stack)
+            if current == previous:
+                previous_count += 1
+            else:
+                f.write("%s %d\n" % (previous, previous_count))
+                previous_count = 1
+                previous = current
+        f.write("%s %d\n" % (previous, previous_count))
+
+
 if __name__ == '__main__':
     main()
-
