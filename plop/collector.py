@@ -129,20 +129,19 @@ def main():
     # TODO: more options, refactor this into somewhere shared
     # between tornado.autoreload and auto2to3
     parser = argparse.ArgumentParser(description="Plop: Python Low-Overhead Profiler",
-                                     prog="python -m plop.collector")
-    parser.add_argument("--format", "-f", help="Output format. Default: plop",
+                                     prog="python -m plop.collector",
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--format", "-f", help="Output format",
                         choices=["plop", "flamegraph"], default="plop")
     parser.add_argument("--module", "-m", help="Execute target as a module",
                         action="store_const", const=True, default=False)
-    parser.add_argument("--mode", help=("Interval timer mode to use, see `man 2 setitimer`. "
-                        "Default: prof"), choices=["prof", "real", "virtual"], default="prof")
-    parser.add_argument("--interval", help="Timer interval in seconds. Default: 0.01",
-                        default=0.01, type=float)
-    parser.add_argument("--duration", help="Profiling duration in seconds. Default: 3600",
-                        default=3600, type=int)
+    parser.add_argument("--mode", help="Interval timer mode to use, see `man 2 setitimer`",
+                        choices=["prof", "real", "virtual"], default="prof")
+    parser.add_argument("--interval", help="Timer interval in seconds", default=0.01, type=float)
+    parser.add_argument("--duration", help="Profiling duration in seconds", default=3600,
+                        type=int)
     parser.add_argument("--max-stacks", help=("Number of most frequent stacks to store."
-                        " Ignored for Flamegraph output. Default: 50"), type=int,
-                        default=50)
+                        " Ignored for Flamegraph output."), type=int, default=50)
     parser.add_argument("target", help="Module or script to run")
     parser.add_argument("arguments", nargs=argparse.REMAINDER,
                         help="Pass-through arguments for the profiled application")
