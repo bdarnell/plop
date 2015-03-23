@@ -7,12 +7,13 @@ import thread
 import time
 from plop import platform
 
+
 class Collector(object):
     MODES = {
         'prof': (platform.ITIMER_PROF, signal.SIGPROF),
         'virtual': (platform.ITIMER_VIRTUAL, signal.SIGVTALRM),
         'real': (platform.ITIMER_REAL, signal.SIGALRM),
-        }
+    }
 
     def __init__(self, interval=0.01, mode='virtual', flamegraph=False):
         self.interval = interval
@@ -47,7 +48,7 @@ class Collector(object):
 
     def wait(self):
         while not self.stopped:
-            pass # need busy wait; ITIMER_PROF doesn't proceed while sleeping
+            pass  # need busy wait; ITIMER_PROF doesn't proceed while sleeping
 
     def handler(self, sig, current_frame):
         start = time.time()
