@@ -22,6 +22,7 @@ class Collector(object):
         assert mode in Collector.MODES
         timer, sig = Collector.MODES[self.mode]
         signal.signal(sig, self.handler)
+        signal.siginterrupt(sig, False)
         self.reset()
 
     def reset(self):
