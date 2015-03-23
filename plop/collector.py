@@ -5,6 +5,7 @@ import signal
 import sys
 import thread
 import time
+import argparse
 from plop import platform
 
 
@@ -82,38 +83,40 @@ class Collector(object):
 def main():
     # TODO: more options, refactor this into somewhere shared
     # between tornado.autoreload and auto2to3
-    flamegraph = False
-    if len(sys.argv) > 1 and sys.argv[1] == '-f':
-        flamegraph = True
-        del sys.argv[1]
-    if len(sys.argv) >= 3 and sys.argv[1] == '-m':
-        mode = 'module'
-        module = filename_base = sys.argv[2]
-        del sys.argv[1:3]
-    elif len(sys.argv) >= 2:
-        mode = "script"
-        script = filename_base = sys.argv[1]
-        sys.argv = sys.argv[1:]
-    else:
-        print "usage: python -m plop.collector [-f] -m module_to_run"
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Plop: Python Low-Overhead Profiler",
+                                     prog="python -m plop.collector")
+    parser.add_argument("--flamegraph", "-f", help="Record stack traces in Flamegraph format",
+                        action="store_const", const=True, default=False)
+    parser.add_argument("--module", "-m", help="Execute target as a module",
+                        action="store_const", const=True, default=False)
+    parser.add_argument("--mode", help=("Interval timer mode to use, see `man 2 setitimer`. "
+                        "Default: prof"), choices=["prof", "real", "virtual"], default="prof")
+    parser.add_argument("--interval", help="Timer interval in seconds. Default: 0.01",
+                        default=0.01, type=float)
+    parser.add_argument("--duration", help="profiling duration in seconds. Default: 3600",
+                        default=3600, type=int)
+    parser.add_argument("target", help="Module or script to run")
+    parser.add_argument("arguments", nargs=argparse.REMAINDER,
+                        help="Pass-through arguments for the profiled application")
+    args = parser.parse_args()
+    sys.argv = [args.target] + args.arguments
 
     if not os.path.exists('profiles'):
         os.mkdir('profiles')
-    filename = 'profiles/%s-%s.plop' % (filename_base,
+    filename = 'profiles/%s-%s.plop' % (args.target,
                                         time.strftime('%Y%m%d-%H%M-%S'))
 
-    collector = Collector(flamegraph=flamegraph)
-    collector.start(duration=3600)
+    collector = Collector(flamegraph=args.flamegraph, mode=args.mode, interval=args.interval)
+    collector.start(duration=args.duration)
     exit_code = 0
     try:
-        if mode == "module":
+        if args.module:
             import runpy
-            runpy.run_module(module, run_name="__main__", alter_sys=True)
-        elif mode == "script":
-            with open(script) as f:
+            runpy.run_module(args.target, run_name="__main__", alter_sys=True)
+        else:
+            with open(args.target) as f:
                 global __file__
-                __file__ = script
+                __file__ = args.target
                 # Use globals as our "locals" dictionary so that
                 # something that tries to import __main__ (e.g. the unittest
                 # module) will see the right things.
@@ -123,7 +126,7 @@ def main():
     collector.stop()
     collector.filter(50)
     if collector.samples_taken:
-        if collector.flamegraph:
+        if args.flamegraph:
             store_flamegraph(filename, collector)
         else:
             with open(filename, 'w') as f:
