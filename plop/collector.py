@@ -79,7 +79,7 @@ class CollectorFormatter(object):
         raise Exception("not implemented")
 
     def store(self, collector, filename):
-        with open(filename, "w") as f:
+        with open(filename, "wb") as f:
             f.write(self.format(collector))
 
 
