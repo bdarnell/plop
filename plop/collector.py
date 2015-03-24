@@ -97,7 +97,7 @@ class PlopFormatter(CollectorFormatter):
             stack_counts[tuple(frames)] += 1
         stack_counts = dict(sorted(stack_counts.iteritems(),
                                 key=lambda kv: -kv[1])[:self.max_stacks])
-        return repr(dict(stack_counts))
+        return repr(stack_counts)
 
 
 class FlamegraphFormatter(CollectorFormatter):
