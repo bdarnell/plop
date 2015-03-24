@@ -120,8 +120,7 @@ class FlamegraphFormatter(CollectorFormatter):
         return output
 
     def format_flame(self, stack):
-        stack.reverse()
-        funcs = map(lambda stack: "%s (%s:%s)" % (stack[2], stack[0], stack[1]), stack)
+        funcs = map("{0[2]} ({0[0]}:{0[1]})".format, reversed(stack))
         return ";".join(funcs)
 
 
