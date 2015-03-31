@@ -1,12 +1,17 @@
+import ast
 import logging
 import threading
 import time
 import unittest
 
-from plop.collector import Collector
+from plop.collector import Collector, PlopFormatter
 
 class CollectorTest(unittest.TestCase):
-    def filter_stacks(self, stack_counts):
+    def filter_stacks(self, collector):
+        # Kind of hacky, but this is the simplest way to keep the tests
+        # working after the internals of the collector changed to support
+        # multiple formatters.
+        stack_counts = ast.literal_eval(PlopFormatter().format(collector))
         counts = {}
         for stack, count in stack_counts.iteritems():
             filtered_stack = [frame[2] for frame in stack
@@ -55,7 +60,7 @@ class CollectorTest(unittest.TestCase):
         elapsed = end - start
         self.assertTrue(0.8 < elapsed < 0.9, elapsed)
 
-        counts = self.filter_stacks(collector.stack_counts)
+        counts = self.filter_stacks(collector)
         
         expected = {
             ('a', 'test_collector'): 10,
@@ -94,7 +99,7 @@ class CollectorTest(unittest.TestCase):
         elapsed = end - start
         self.assertTrue(0.3 < elapsed < 0.4, elapsed)
 
-        counts = self.filter_stacks(collector.stack_counts)
+        counts = self.filter_stacks(collector)
 
         expected = {
             ('a', 'test_collect_threads'): 10,

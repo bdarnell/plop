@@ -1,0 +1,11 @@
+language: python
+python:
+  - 2.7
+
+install:
+  - travis_retry pip install -r requirements.txt
+
+script:
+  - python -m plop.test.runtests
+
+sudo: false

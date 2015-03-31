@@ -19,10 +19,11 @@ Installation
 Prerequisites
 -------------
 
-The ``plop.collector`` module runs on Python 2.5, 2.6, and 2.7 on Unixy
-platforms including Linux, BSD and Mac OS X (must support the ``setitimer``
-system call).  The ``plop.viewer`` module requires Python 2.7 and Tornado
-2.x.  The viewer can be (and usually is) run separately from the collector.
+The ``plop.collector`` module runs on Python 2.7 on Unixy platforms
+including Linux, BSD and Mac OS X (must support the ``setitimer``
+system call).  The ``plop.viewer`` module requires Python 2.7 and
+Tornado 2.x or newer.  The viewer can be (and usually is) run
+separately from the collector.
 
 Usage
 -----
