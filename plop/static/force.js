@@ -85,6 +85,7 @@
   window.fetchData = function(filename) {
     d3.json('/data?filename=' + filename, dataReady);
   }
+  window.dataReady = dataReady;
   window.onresize = updateWindow;
 
 })();
