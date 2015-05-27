@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import datetime
-from plop.collector import Collector
+from plop.collector import Collector, PlopFormatter
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
 from tornado.ioloop import IOLoop
@@ -29,7 +29,8 @@ class ProfileHandler(RequestHandler):
 
     def finish_profile(self):
         self.collector.stop()
-        self.finish(repr(dict(self.collector.stack_counts)))
+        formatter = PlopFormatter()
+        self.finish(formatter.format(self.collector))
 
 @gen.engine
 def generate_traffic():
