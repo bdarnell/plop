@@ -6,14 +6,14 @@ import sys
 import thread
 import time
 import argparse
-from plop import platform
+import plop.platform
 
 
 class Collector(object):
     MODES = {
-        'prof': (platform.ITIMER_PROF, signal.SIGPROF),
-        'virtual': (platform.ITIMER_VIRTUAL, signal.SIGVTALRM),
-        'real': (platform.ITIMER_REAL, signal.SIGALRM),
+        'prof': (plop.platform.ITIMER_PROF, signal.SIGPROF),
+        'virtual': (plop.platform.ITIMER_VIRTUAL, signal.SIGVTALRM),
+        'real': (plop.platform.ITIMER_REAL, signal.SIGALRM),
     }
 
     def __init__(self, interval=0.01, mode='virtual'):
@@ -39,7 +39,7 @@ class Collector(object):
         self.stopped = False
         self.samples_remaining = int(duration / self.interval)
         timer, sig = Collector.MODES[self.mode]
-        platform.setitimer(timer, self.interval, self.interval)
+        plop.platform.setitimer(timer, self.interval, self.interval)
 
     def stop(self):
         self.stopping = True
@@ -53,7 +53,7 @@ class Collector(object):
         start = time.time()
         self.samples_remaining -= 1
         if self.samples_remaining <= 0 or self.stopping:
-            platform.setitimer(Collector.MODES[self.mode][0], 0, 0)
+            plop.platform.setitimer(Collector.MODES[self.mode][0], 0, 0)
             self.stopped = True
             return
         current_tid = thread.get_ident()
@@ -96,7 +96,7 @@ class PlopFormatter(CollectorFormatter):
         for frames in collector.stacks:
             stack_counts[tuple(frames)] += 1
         stack_counts = dict(sorted(stack_counts.iteritems(),
-                                key=lambda kv: -kv[1])[:self.max_stacks])
+                                   key=lambda kv: -kv[1])[:self.max_stacks])
         return repr(stack_counts)
 
 
@@ -172,11 +172,16 @@ def main():
             runpy.run_module(args.target, run_name="__main__", alter_sys=True)
         else:
             with open(args.target) as f:
+                # Execute the script in our namespace instead of creating
+                # a new one so that something that tries to import __main__
+                # (e.g. the unittest module) will see names defined in the
+                # script instead of just those defined in this module.
                 global __file__
                 __file__ = args.target
-                # Use globals as our "locals" dictionary so that
-                # something that tries to import __main__ (e.g. the unittest
-                # module) will see the right things.
+                # If __package__ is defined, imports may be incorrectly
+                # interpreted as relative to this module.
+                global __package__
+                del __package__
                 exec f.read() in globals(), globals()
     except SystemExit, e:
         exit_code = e.code
