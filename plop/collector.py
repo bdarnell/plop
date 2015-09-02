@@ -3,7 +3,7 @@ import collections
 import os
 import signal
 import sys
-import thread
+from six.moves import _thread
 import time
 import argparse
 import six
@@ -57,7 +57,7 @@ class Collector(object):
             plop.platform.setitimer(Collector.MODES[self.mode][0], 0, 0)
             self.stopped = True
             return
-        current_tid = thread.get_ident()
+        current_tid = _thread.get_ident()
         for tid, frame in six.iteritems(sys._current_frames()):
             if tid == current_tid:
                 frame = current_frame
