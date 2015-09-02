@@ -7,6 +7,7 @@ import os
 from tornado.ioloop import IOLoop
 from tornado.options import define, options, parse_command_line
 from tornado.web import RequestHandler, Application
+import six
 
 from plop.callgraph import CallGraph
 
@@ -66,17 +67,17 @@ def profile_to_json(filename):
     # it helps.
     degrees = Counter()
     dropped = set()
-    for edge in graph.edges.itervalues():
+    for edge in six.itervalues(graph.edges):
         degrees[edge.child.id] += 1
         degrees[edge.parent.id] += 1
-    for node, degree in degrees.iteritems():
+    for node, degree in six.iteritems(degrees):
         if degree > 6:
             dropped.add(node)
 
     edges = [dict(source=index[edge.parent.id],
                   target=index[edge.child.id],
                   weights=edge.weights)
-             for edge in graph.edges.itervalues()
+             for edge in six.itervalues(graph.edges)
              if (edge.parent.id in index and
                  edge.child.id in index and
                  edge.parent.id not in dropped and
@@ -104,8 +105,8 @@ def main():
 
     app = Application(handlers, **settings)
     app.listen(options.port, address=options.address)
-    print "server starting at http://%s:%s" % (options.address or 'localhost',
-                                               options.port)
+    print("server starting at http://%s:%s" % (options.address or 'localhost',
+                                               options.port))
     IOLoop.instance().start()
 
 if __name__ == '__main__':

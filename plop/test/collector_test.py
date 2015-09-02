@@ -3,6 +3,7 @@ import logging
 import threading
 import time
 import unittest
+import six
 
 from plop.collector import Collector, PlopFormatter
 
@@ -13,7 +14,7 @@ class CollectorTest(unittest.TestCase):
         # multiple formatters.
         stack_counts = ast.literal_eval(PlopFormatter().format(collector))
         counts = {}
-        for stack, count in stack_counts.iteritems():
+        for stack, count in six.iteritems(stack_counts):
             filtered_stack = [frame[2] for frame in stack
                               if frame[0].endswith('collector_test.py')]
             if filtered_stack:
@@ -23,7 +24,7 @@ class CollectorTest(unittest.TestCase):
     def check_counts(self, counts, expected):
         failed = False
         output = []
-        for stack, count in expected.items():
+        for stack, count in six.iteritems(expected):
             # every expected frame should appear in the data, but
             # the inverse is not true if the signal catches us between
             # calls.
