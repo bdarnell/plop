@@ -183,9 +183,8 @@ def main():
                 # interpreted as relative to this module.
                 global __package__
                 del __package__
-                exec(f.read() in globals(), globals())
-    except SystemExit:
-        e = sys.exc_info()[1]
+                six.exec_(f.read(), globals(), globals())
+    except SystemExit as e:
         exit_code = e.code
     collector.stop()
     if collector.samples_taken:
