@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name="plop",
@@ -15,4 +15,8 @@ setup(
         },
     author="Ben Darnell",
     url="https://github.com/bdarnell/plop",
+    install_requires=[
+        'tornado',
+        'six',
+    ],
     )

@@ -1,4 +1,5 @@
 from collections import Counter
+import six
 
 
 class Node(object):
@@ -68,13 +69,13 @@ class CallGraph(object):
 
     def get_top_edges(self, weight, num=10):
         # TODO: is there a partial sort in python?
-        sorted_edges = sorted(self.edges.values(),
+        sorted_edges = sorted(six.itervalues(self.edges),
                               key=lambda e: e.weights.get(weight, 0),
                               reverse=True)
         return sorted_edges[:num]
 
     def get_top_nodes(self, weight, num=10):
-        sorted_nodes = sorted(self.nodes.values(),
+        sorted_nodes = sorted(six.itervalues(self.nodes),
                               key=lambda n: n.weights.get(weight, 0),
                               reverse=True)
         return sorted_nodes[:num]
@@ -85,7 +86,7 @@ class CallGraph(object):
         with open(filename) as f:
             data = ast.literal_eval(f.read())
         graph = CallGraph()
-        for stack, count in data.iteritems():
+        for stack, count in six.iteritems(data):
             stack_nodes = [Node(id=frame, attrs=dict(fullpath=frame[0],
                                                      filename=frame[0].rpartition('/')[-1],
                                                      lineno=frame[1],

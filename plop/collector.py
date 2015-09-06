@@ -3,9 +3,10 @@ import collections
 import os
 import signal
 import sys
-import thread
+from six.moves import _thread
 import time
 import argparse
+import six
 import plop.platform
 
 
@@ -56,8 +57,8 @@ class Collector(object):
             plop.platform.setitimer(Collector.MODES[self.mode][0], 0, 0)
             self.stopped = True
             return
-        current_tid = thread.get_ident()
-        for tid, frame in sys._current_frames().items():
+        current_tid = _thread.get_ident()
+        for tid, frame in six.iteritems(sys._current_frames()):
             if tid == current_tid:
                 frame = current_frame
             frames = []
@@ -95,7 +96,7 @@ class PlopFormatter(CollectorFormatter):
         stack_counts = collections.defaultdict(int)
         for frames in collector.stacks:
             stack_counts[tuple(frames)] += 1
-        stack_counts = dict(sorted(stack_counts.iteritems(),
+        stack_counts = dict(sorted(six.iteritems(stack_counts),
                                    key=lambda kv: -kv[1])[:self.max_stacks])
         return repr(stack_counts)
 
@@ -182,18 +183,18 @@ def main():
                 # interpreted as relative to this module.
                 global __package__
                 del __package__
-                exec f.read() in globals(), globals()
-    except SystemExit, e:
+                six.exec_(f.read(), globals(), globals())
+    except SystemExit as e:
         exit_code = e.code
     collector.stop()
     if collector.samples_taken:
         formatter.store(collector, filename)
-        print "profile output saved to %s" % filename
+        print("profile output saved to %s" % filename)
         overhead = float(collector.sample_time) / collector.samples_taken
-        print "overhead was %s per sample (%s%%)" % (
-            overhead, overhead / collector.interval)
+        print("overhead was %s per sample (%s%%)" % (
+            overhead, overhead / collector.interval))
     else:
-        print "no samples collected; program was too fast"
+        print("no samples collected; program was too fast")
     sys.exit(exit_code)
 
 
