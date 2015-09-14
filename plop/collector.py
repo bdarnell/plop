@@ -81,7 +81,7 @@ class CollectorFormatter(object):
 
     def store(self, collector, filename):
         with open(filename, "wb") as f:
-            f.write(self.format(collector))
+            f.write(self.format(collector).encode('utf-8'))
 
 
 class PlopFormatter(CollectorFormatter):
