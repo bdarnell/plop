@@ -4,3 +4,4 @@ MANIFEST
 .vagrant
 dist
 profiles
+plop.egg-info
