@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="plop",
-    version="0.2.0",
+    version="0.3.0",
     packages=["plop", "plop.test"],
     package_data={
         "plop": [

@@ -19,42 +19,45 @@ Installation
 Prerequisites
 -------------
 
-The ``plop.collector`` module runs on Python 2.7 on Unixy platforms
-including Linux, BSD and Mac OS X (must support the ``setitimer``
-system call).  The ``plop.viewer`` module requires Python 2.7 and
-Tornado 2.x or newer.  The viewer can be (and usually is) run
+Plop runs on Python 2.7 and 3.x. The ``plop.collector`` module runs on
+Unixy platforms including Linux, BSD and Mac OS X (must support the
+``setitimer`` system call). The ``plop.viewer`` module requires
+Tornado 2.x or newer. The viewer can be (and usually is) run
 separately from the collector.
 
 Usage
 -----
 
-In the application to be profiled, create a ``plop.collector.Collector``,
-call ``start()``, wait, then ``stop()``.  Write
-``repr(dict(collector.stack_counts))`` to a file.  See ``ProfileHandler`` in
-``demo/busy_server.py`` for an example of how to trigger profiling via an HTTP
-interface.
+In the application to be profiled, create a
+``plop.collector.Collector``, call ``start()``, wait, then ``stop()``.
+Create a `Formatter` (either `PlopFormatter` or `FlamegraphFormatter`)
+and call its `save()` method to write the output to a file. See
+``ProfileHandler`` in ``demo/busy_server.py`` for an example of how to
+trigger profiling via an HTTP interface.
 
 To profile an entire Python script, run::
 
     python -m plop.collector myscript.py
 
-This will write the profile to ``/tmp/plop.out``
+This will write the profile to ``./profiles/[timestamp]``. Add `-f
+flamegraph` for flamegraph output.
 
 
-To use the viewer, run::
+To use the viewer for the default `.plop` output format, , run::
 
     python -m plop.viewer --datadir=demo/profiles
 
-and go to http://localhost:8888
+and go to http://localhost:8888. For `.flame` format, see
+https://github.com/brendangregg/FlameGraph
 
 Interpretation
 --------------
 
-Circle size is based on the amount of time that function was at the top of 
-the stack (i.e. time in that function, not any of its descendants). Arrow 
-thickness is based on how often that call was present anywhere in the stack. 
+In the default viewer, circle size is based on the amount of time that function was at the top of
+the stack (i.e. time in that function, not any of its descendants). Arrow
+thickness is based on how often that call was present anywhere in the stack.
 
-In other words, the circle size corresponds to "time", and the arrow size 
+In other words, the circle size corresponds to "time", and the arrow size
 roughly corresponds to "cumulative time".
 
 Example
