@@ -1,11 +1,12 @@
 #!/bin/bash
 
 set -e
+dir="$(dirname "$0")"
 
-if [[ ! -f ~/envs/plop-demo/bin/activate ]]; then
+if [[ ! -f "$dir/envs/plop-demo/bin/activate" ]]; then
     ./setup.sh
 fi
-source ~/envs/plop-demo/bin/activate
+source "$dir/envs/plop-demo/bin/activate"
 
 python -m busy_server &
 server_pid=$!

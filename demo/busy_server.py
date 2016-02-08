@@ -38,7 +38,7 @@ def generate_traffic():
     while True:
         resp = yield gen.Task(client.fetch,
                               'http://localhost:%d/' % options.port)
-        assert resp.body.strip() == 'Hello world!'
+        assert resp.body.strip().decode("utf-8") == 'Hello world!'
 
 def main():
     parse_command_line()
