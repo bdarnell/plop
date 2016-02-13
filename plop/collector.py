@@ -64,7 +64,7 @@ class Collector(object):
             frames = []
             while frame is not None:
                 code = frame.f_code
-                frames.append((code.co_filename, code.co_firstlineno, code.co_name))
+                frames.append((code.co_filename, frame.f_lineno, code.co_name))
                 frame = frame.f_back
             self.stacks.append(frames)
         end = time.time()
