@@ -1,10 +1,13 @@
 #!/bin/bash
 
 set -e
+dir="$(dirname "${BASH_SOURCE[0]}")"
+: ${PYTHON:=python}
 
-if [[ ! -f ~/envs/plop-demo/bin/activate ]]; then
-    virtualenv -p python2.7 --no-site-packages ~/envs/plop-demo
+if [[ ! -f "$dir/envs/plop-demo/bin/activate" ]]; then
+    "$PYTHON" -mvenv "$dir/envs/plop-demo" || \
+        "$PYTHON" -mvirtualenv --no-site-packages "$dir/envs/plop-demo"
 fi
-source ~/envs/plop-demo/bin/activate
+source "$dir/envs/plop-demo/bin/activate"
 
-pip install -r requirements.txt
+python -mpip install -r requirements.txt

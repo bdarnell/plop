@@ -1,5 +1,6 @@
 from __future__ import with_statement
 import collections
+import errno
 import os
 import signal
 import sys
@@ -159,10 +160,16 @@ def main():
         sys.stderr.flush()
         sys.exit(1)
 
-    if not os.path.exists('profiles'):
+    try:  # This is equivalent to os.makedirs('profiles', exist_ok=True)
         os.mkdir('profiles')
-    filename = 'profiles/%s-%s.%s' % (args.target, time.strftime('%Y%m%d-%H%M-%S'),
-                                      extension)
+    except OSError as exc:
+        if exc.errno != errno.EEXIST:
+            raise
+    filename = os.path.join(
+        'profiles',
+        '%s-%s.%s' % (os.path.basename(args.target),
+                      time.strftime('%Y%m%d-%H%M-%S'),
+                      extension))
 
     collector = Collector(mode=args.mode, interval=args.interval)
     collector.start(duration=args.duration)
