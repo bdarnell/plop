@@ -2,9 +2,10 @@
 language: python
 python:
   - 2.7
+  - 3.6
 
 install:
-  - travis_retry pip install -r requirements.txt
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then travis_retry pip install -r requirements-py27.txt; else travis_retry pip install -r requirements.txt; fi
 
 script:
   - python -m plop.test.runtests
