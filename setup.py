@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="plop",
-    version="0.3.0",
+    version="0.4.0",
     packages=["plop", "plop.test"],
     package_data={
         "plop": [
@@ -10,13 +10,10 @@ setup(
             "templates/force.html",
             "templates/force-flat.html",
             "static/force.js",
-            "static/styles.css"
-            ],
-        },
+            "static/styles.css",
+        ]
+    },
     author="Ben Darnell",
     url="https://github.com/bdarnell/plop",
-    install_requires=[
-        'tornado',
-        'six',
-    ],
-    )
+    install_requires=["tornado", "six"],
+)
