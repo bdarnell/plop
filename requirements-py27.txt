@@ -1,2 +1,2 @@
-tornado<6.0
+tornado<7.0
 six
