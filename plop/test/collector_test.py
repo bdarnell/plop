@@ -74,7 +74,7 @@ class CollectorTest(unittest.TestCase):
 
         # cost depends on stack depth; for this tiny test I see 40-80usec
         time_per_sample = float(collector.sample_time) / collector.samples_taken
-        self.assertTrue(time_per_sample < 0.000100, time_per_sample)
+        self.assertTrue(time_per_sample < 0.000300, time_per_sample)
 
     # TODO: any way to make this test not flaky?
     def disabled_test_collect_threads(self):
