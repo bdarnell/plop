@@ -4,10 +4,10 @@ Plop: Python Low-Overhead Profiler
 Plop is a stack-sampling profiler for Python.  Profile collection can be
 turned on and off in a live process with minimal performance impact.
 
-Plop is currently a work in progress and pretty rough around the edges,
-so be prepared to run into bugs and extremely unrefined interfaces
-(which are likely to change in backwards-incompatible ways in future
-releases).
+**Plop is deprecated and will have no future updates.** A variety of more
+actively-maintained profiling tools exist, including the standard 
+library's `profiling.sampling <https://docs.python.org/3.15/library/profiling.sampling.html>`_
+module introduced in Python 3.15.
 
 Installation
 ------------
